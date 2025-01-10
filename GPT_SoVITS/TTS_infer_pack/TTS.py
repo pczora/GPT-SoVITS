@@ -18,16 +18,16 @@ import torch
 import yaml
 from transformers import AutoModelForMaskedLM, AutoTokenizer
 
-from ..AR.models.t2s_lightning_module import Text2SemanticLightningModule
-from ..feature_extractor.cnhubert import CNHubert
-from ..module.models import SynthesizerTrn
+from AR.models.t2s_lightning_module import Text2SemanticLightningModule
+from feature_extractor.cnhubert import CNHubert
+from module.models import SynthesizerTrn
 import librosa
 from time import time as ttime
-from ...tools.i18n.i18n import I18nAuto, scan_language_list
-from ...tools.my_utils import load_audio
-from ..module.mel_processing import spectrogram_torch
-from text_segmentation_method import splits
-from TextPreprocessor import TextPreprocessor
+from tools.i18n.i18n import I18nAuto, scan_language_list
+from tools.my_utils import load_audio
+from module.mel_processing import spectrogram_torch
+from TTS_infer_pack.text_segmentation_method import splits
+from TTS_infer_pack.TextPreprocessor import TextPreprocessor
 
 language = os.environ.get("language", "Auto")
 language = sys.argv[-1] if sys.argv[-1] in scan_language_list() else language
