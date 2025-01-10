@@ -1,6 +1,7 @@
 # modified from https://github.com/yangdongchao/SoundStorm/blob/master/soundstorm/s1/AR/models/t2s_lightning_module.py
 # reference: https://github.com/lifeiteng/vall-e
-import os, sys
+import os
+import sys
 
 now_dir = os.getcwd()
 sys.path.append(now_dir)
@@ -11,6 +12,7 @@ from pytorch_lightning import LightningModule
 from t2s_model import Text2SemanticDecoder
 from ..modules.lr_schedulers import WarmupCosineLRSchedule
 from ..modules.optim import ScaledAdam
+
 
 class Text2SemanticLightningModule(LightningModule):
     def __init__(self, config, output_dir, is_train=True):
@@ -35,7 +37,7 @@ class Text2SemanticLightningModule(LightningModule):
     def training_step(self, batch: Dict, batch_idx: int):
         opt = self.optimizers()
         scheduler = self.lr_schedulers()
-        forward=self.model.forward if self.config["train"].get("if_dpo",False)==True else self.model.forward_old
+        forward = self.model.forward if self.config["train"].get("if_dpo", False) == True else self.model.forward_old
         loss, acc = forward(
             batch["phoneme_ids"],
             batch["phoneme_ids_len"],
