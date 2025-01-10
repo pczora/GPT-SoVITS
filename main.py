@@ -20,6 +20,9 @@ config_path = "GPT_SoVITS/configs/tts_infer.yaml"
 tts_config = TTS_Config(config_path)
 tts_pipeline = TTS(tts_config)
 
+import sys
+sys.path.append("/root/GPT-SoVITS/")
+
 
 def check_credentials(username, password):
     return username == app.config['BASIC_AUTH_USERNAME'] and password == app.config['BASIC_AUTH_PASSWORD']
