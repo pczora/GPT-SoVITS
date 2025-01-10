@@ -26,6 +26,7 @@ ARG IMAGE_TYPE=full
 # Always copy the Docker directory, but only use it if IMAGE_TYPE is not "elite"
 COPY ./Docker /workspace/Docker 
 # elite 类型的镜像里面不包含额外的模型
+# translates to 'The image of this type does not contain additional models'
 RUN if [ "$IMAGE_TYPE" != "elite" ]; then \
         chmod +x /workspace/Docker/download.sh && \
         /workspace/Docker/download.sh && \

@@ -9,7 +9,7 @@ from GPT_SoVITS.TTS_infer_pack.TTS import TTS, TTS_Config
 
 from api_v2 import pack_audio
 
-UPLOAD_FOLDER = 'workspace/reference_voices'
+UPLOAD_FOLDER = '/workspace/reference_voices'
 ALLOWED_EXTENSIONS = {'wav'}
 
 app = Flask(__name__)
@@ -17,10 +17,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config.from_prefixed_env('GPTSOVITS_API')
 
 config_path = "GPT_SoVITS/configs/tts_infer.yaml"
-
-if config_path in [None, ""]:
-    config_path = "GPT-SoVITS/configs/tts_infer.yaml"
-
 tts_config = TTS_Config(config_path)
 tts_pipeline = TTS(tts_config)
 
