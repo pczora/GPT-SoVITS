@@ -3,8 +3,7 @@ from functools import wraps
 from io import BytesIO
 
 import sys
-# sys.path.extend("/root/GPT-SoVITS/")
-# sys.path.extend("/root/GPT-SoVITS/GPT-SoVITS")
+sys.path.extend("/root/GPT-SoVITS/GPT-SoVITS")
 
 print("==== sys.path ====")
 print(sys.path)
