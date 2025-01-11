@@ -2,11 +2,6 @@ import os
 from functools import wraps
 from io import BytesIO
 
-import sys
-
-print("==== sys.path ====")
-print(sys.path)
-
 from flask import Flask, make_response, request, jsonify
 from werkzeug.utils import secure_filename
 
