@@ -21,8 +21,11 @@ tts_config = TTS_Config(config_path)
 tts_pipeline = TTS(tts_config)
 
 import sys
-sys.path.append("/root/GPT-SoVITS/")
+# sys.path.extend("/root/GPT-SoVITS/")
+# sys.path.extend("/root/GPT-SoVITS/GPT-SoVITS")
 
+print("==== sys.path ====")
+print(sys.path)
 
 def check_credentials(username, password):
     return username == app.config['BASIC_AUTH_USERNAME'] and password == app.config['BASIC_AUTH_PASSWORD']
