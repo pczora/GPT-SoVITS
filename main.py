@@ -52,10 +52,10 @@ def allowed_file(filename):
 @basic_auth
 def upload_voice():
     if 'file' not in request.files:
-        return jsonify({'message': 'Bad Request'}), 400
+        return jsonify({'message': 'Bad Request; file not present'}), 400
     voice_file = request.files['file']
     if voice_file.filename == '':
-        return jsonify({'message': 'Bad Request'}), 400
+        return jsonify({'message': 'Bad Request; file name not present'}), 400
     if voice_file and allowed_file(voice_file.filename):
         filename = secure_filename(voice_file.filename)
         voice_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -112,4 +112,4 @@ def generate():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0',port=5555,  debug=True)
