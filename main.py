@@ -9,7 +9,7 @@ from GPT_SoVITS.TTS_infer_pack.TTS import TTS, TTS_Config
 
 from api_v2 import pack_audio
 
-UPLOAD_FOLDER = 'workspace/reference_voices'
+UPLOAD_FOLDER = '/workspace/reference_voices'
 ALLOWED_EXTENSIONS = {'wav', 'txt'}
 
 app = Flask(__name__)
