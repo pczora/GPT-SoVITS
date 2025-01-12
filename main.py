@@ -9,8 +9,8 @@ from GPT_SoVITS.TTS_infer_pack.TTS import TTS, TTS_Config
 
 from api_v2 import pack_audio
 
-UPLOAD_FOLDER = '/workspace/reference_voices'
-ALLOWED_EXTENSIONS = {'wav'}
+UPLOAD_FOLDER = 'workspace/reference_voices'
+ALLOWED_EXTENSIONS = {'wav', 'txt'}
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -53,6 +53,10 @@ def upload_voice():
     if voice_file and allowed_file(voice_file.filename):
         filename = secure_filename(voice_file.filename)
         voice_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        if 'reference_text' in request.files:
+            reference_text_file = request.files['reference_text']
+            reference_text_filename = voice_file.filename.replace(".wav", ".txt")
+            reference_text_file.save(os.path.join(app.config['UPLOAD_FOLDER'], reference_text_filename))
     return jsonify({'message': 'OK'}), 200
 
 
@@ -60,15 +64,22 @@ def upload_voice():
 @basic_auth
 def generate():
     text = request.json['text']
-    voice_name = request.json['voice_name']
+    voice_name = str(request.json['voice_name'])
     print(voice_name)
+
+    reference_text_path = os.path.join(app.config['UPLOAD_FOLDER'], voice_name.replace(".wav", ".txt"))
+    reference_text = ""
+    if os.path.isfile(reference_text_path):
+        f = open(reference_text_path, "r")
+        reference_text = f.read()
+        f.close()
 
     req = {
         "text": text,  # str.(required) text to be synthesized
         "text_lang": "en",  # str.(required) language of the text to be synthesized
         "ref_audio_path": os.path.join(app.config['UPLOAD_FOLDER'], voice_name),  # str.(required) reference audio path
         "aux_ref_audio_paths": [],  # list.(optional) auxiliary reference audio paths for multi-speaker synthesis
-        "prompt_text": "",  # str.(optional) prompt text for the reference audio
+        "prompt_text": reference_text,  # str.(optional) prompt text for the reference audio
         "prompt_lang": "en",  # str.(required) language of the prompt text for the reference audio
         "top_k": 5,  # int. top k sampling
         "top_p": 1,  # float. top p sampling
