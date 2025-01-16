@@ -2,6 +2,7 @@ import os
 from functools import wraps
 from io import BytesIO
 
+import flask.wrappers
 from flask import Flask, make_response, request, jsonify
 from werkzeug.utils import secure_filename
 
@@ -20,6 +21,24 @@ config_path = "GPT_SoVITS/configs/tts_infer.yaml"
 tts_config = TTS_Config(config_path)
 tts_pipeline = TTS(tts_config)
 
+
+defaults = {
+    "text_lang": "en",
+    "prompt_lang": "en",  # str.(required) language of the prompt text for the reference audio
+    "top_k": 5,  # int. top k sampling
+    "top_p": 1,  # float. top p sampling
+    "temperature": 1,  # float. temperature for sampling
+    "text_split_method": "cut5",  # str. text split method, see text_segmentation_method.py for details.
+    "batch_size": 1,  # int. batch size for inference
+    "batch_threshold": 0.75,  # float. threshold for batch splitting.
+    "split_bucket": True,  # bool. whether to split the batch into multiple buckets.
+    "speed_factor": 1.0,  # float. control the speed of the synthesized audio.
+    "fragment_interval": 0.3,  # float. to control the interval of the audio fragment.
+    "seed": -1,  # int. random seed for reproducibility.
+    "media_type": "wav",  # str. media type of the output audio, support "wav", "raw", "ogg", "aac".
+    "parallel_infer": True,  # bool.(optional) whether to use parallel inference.
+    "repetition_penalty": 1.35  # float.(optional) repetition penalty for T2S model.
+}
 
 
 def check_credentials(username, password):
@@ -74,27 +93,45 @@ def generate():
         reference_text = f.read()
         f.close()
 
+
+    text_lang = from_request_or_default('text_lang', request)
+    prompt_lang = from_request_or_default('prompt_lang', request)
+    top_k = from_request_or_default('top_k', request)
+    top_p = from_request_or_default('top_p', request)
+    temperature = from_request_or_default('temperature', request)
+    text_split_method = from_request_or_default('text_split_method', request)
+    batch_size = from_request_or_default('batch_size', request)
+    batch_threshold = from_request_or_default('batch_threshold', request)
+    split_bucket = from_request_or_default('split_bucket', request)
+    speed_factor = from_request_or_default('speed_factor', request)
+    fragment_interval = from_request_or_default('fragment_interval', request)
+    seed = from_request_or_default('seed', request)
+    media_type = from_request_or_default('media_type', request)
+    parallel_infer = from_request_or_default('parallel_infer', request)
+    repetition_penalty = from_request_or_default('repetition_penalty', request)
+
+
     req = {
         "text": text,  # str.(required) text to be synthesized
-        "text_lang": "en",  # str.(required) language of the text to be synthesized
+        "text_lang": text_lang,  # str.(required) language of the text to be synthesized
         "ref_audio_path": os.path.join(app.config['UPLOAD_FOLDER'], voice_name),  # str.(required) reference audio path
         "aux_ref_audio_paths": [],  # list.(optional) auxiliary reference audio paths for multi-speaker synthesis
         "prompt_text": reference_text,  # str.(optional) prompt text for the reference audio
-        "prompt_lang": "en",  # str.(required) language of the prompt text for the reference audio
-        "top_k": 5,  # int. top k sampling
-        "top_p": 1,  # float. top p sampling
-        "temperature": 1,  # float. temperature for sampling
-        "text_split_method": "cut5",  # str. text split method, see text_segmentation_method.py for details.
-        "batch_size": 1,  # int. batch size for inference
-        "batch_threshold": 0.75,  # float. threshold for batch splitting.
-        "split_bucket": True,  # bool. whether to split the batch into multiple buckets.
-        "speed_factor": 1.0,  # float. control the speed of the synthesized audio.
-        "fragment_interval": 0.3,  # float. to control the interval of the audio fragment.
-        "seed": -1,  # int. random seed for reproducibility.
-        "media_type": "wav",  # str. media type of the output audio, support "wav", "raw", "ogg", "aac".
+        "prompt_lang": prompt_lang,  # str.(required) language of the prompt text for the reference audio
+        "top_k": top_k,  # int. top k sampling
+        "top_p": top_p,  # float. top p sampling
+        "temperature": temperature,  # float. temperature for sampling
+        "text_split_method": text_split_method,  # str. text split method, see text_segmentation_method.py for details.
+        "batch_size": batch_size,  # int. batch size for inference
+        "batch_threshold": batch_threshold,  # float. threshold for batch splitting.
+        "split_bucket": split_bucket,  # bool. whether to split the batch into multiple buckets.
+        "speed_factor": speed_factor,  # float. control the speed of the synthesized audio.
+        "fragment_interval": fragment_interval,  # float. to control the interval of the audio fragment.
+        "seed": seed,  # int. random seed for reproducibility.
+        "media_type": media_type,  # str. media type of the output audio, support "wav", "raw", "ogg", "aac".
         "streaming_mode": False,  # bool. whether to return a streaming response.
-        "parallel_infer": True,  # bool.(optional) whether to use parallel inference.
-        "repetition_penalty": 1.35  # float.(optional) repetition penalty for T2S model.
+        "parallel_infer": parallel_infer,  # bool.(optional) whether to use parallel inference.
+        "repetition_penalty": repetition_penalty  # float.(optional) repetition penalty for T2S model.
     }
     streaming_mode = req.get("streaming_mode", False)
     return_fragment = req.get("return_fragment", False)
@@ -115,6 +152,14 @@ def generate():
     except Exception as e:
         return jsonify({"message": f"tts failed", "Exception": str(e)}), 400
 
+
+def from_request_or_default(key: str, req: flask.wrappers.Request):
+    if key in req.json:
+        return req.json[key]
+    elif key in defaults:
+        return defaults[key]
+    else:
+        return None
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=5555,  debug=True)
