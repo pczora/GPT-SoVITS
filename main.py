@@ -42,8 +42,9 @@ defaults = {
 
 
 def check_credentials(username, password):
-    return username == app.config['BASIC_AUTH_USERNAME'] and password == app.config['BASIC_AUTH_PASSWORD']
-
+    username_check = not app.config['BASIC_AUTH_USERNAME'] or username == app.config['BASIC_AUTH_USERNAME']
+    password_check = not app.config['BASIC_AUTH_PASSWORD'] or password == app.config['BASIC_AUTH_PASSWORD']
+    return  username_check and password_check
 
 def basic_auth(f):
     @wraps(f)
