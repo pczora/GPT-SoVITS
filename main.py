@@ -20,7 +20,6 @@ app.config.from_prefixed_env('GPTSOVITS_API')
 
 
 
-tts_pipeline = None
 
 
 def init_config() -> TTS_Config:
@@ -41,6 +40,8 @@ def init_config() -> TTS_Config:
     print(conf)
     return conf
 
+tts_config = init_config()
+tts_pipeline = TTS(tts_config)
 
 defaults = {
     "text_lang": "en",
@@ -226,7 +227,7 @@ def pack_wav(io_buffer: BytesIO, data: np.ndarray, rate: int):
     io_buffer = BytesIO()
     sf.write(io_buffer, data, rate, format='wav')
     return io_buffer
+
 if __name__ == '__main__':
-    tts_config = init_config()
-    tts_pipeline = TTS(tts_config)
+
     app.run(host='0.0.0.0',port=5555,  debug=True)
