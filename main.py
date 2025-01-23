@@ -34,6 +34,8 @@ def init_config() -> TTS_Config:
         conf.device = app.config["DEVICE"]
     if "T2S_WEIGHT_PATH" in app.config:
         conf.t2s_weights_path = app.config["T2S_WEIGHT_PATH"]
+    if "VITS_WEIGHT_PATH" in app.config:
+        conf.vits_weights_path = app.config["VITS_WEIGHT_PATH"]
     if "VERSION" in app.config:
         conf.version = app.config["VERSION"]
 
