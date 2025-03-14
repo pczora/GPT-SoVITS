@@ -6,8 +6,10 @@ from io import BytesIO
 import flask.wrappers
 import numpy as np
 import soundfile as sf
+from flask_httpauth import HTTPBasicAuth
 from flask import Flask, make_response, request, jsonify
 from werkzeug.utils import secure_filename
+from prometheus_flask_exporter import PrometheusMetrics
 
 from GPT_SoVITS.TTS_infer_pack.TTS import TTS, TTS_Config
 
@@ -18,9 +20,12 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config.from_prefixed_env('GPTSOVITS_API')
 
+auth = HTTPBasicAuth()
+metrics = PrometheusMetrics(app, metrics_decorator=auth.login_required)
 
-
-
+@auth.verify_password
+def verify_credentials(username, password):
+    return (username, password) in {(app.config['BASIC_AUTH_USERNAME']), (app.config['BASIC_AUTH_PASSWORD'])}
 
 def init_config() -> TTS_Config:
     # config_path = "GPT_SoVITS/configs/tts_infer.yaml"

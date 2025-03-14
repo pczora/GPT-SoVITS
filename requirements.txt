@@ -35,3 +35,6 @@ opencc; sys_platform != 'linux'
 opencc==1.1.1; sys_platform == 'linux'
 python_mecab_ko; sys_platform != 'win32'
 fastapi<0.112.2
+prometheus-flask-exporter==0.23.2
+flask_httpauth==4.8.0
+
