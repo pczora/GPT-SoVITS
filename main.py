@@ -23,9 +23,8 @@ app.config.from_prefixed_env('GPTSOVITS_API')
 auth = HTTPBasicAuth()
 metrics = PrometheusMetrics(app, metrics_decorator=auth.login_required)
 
-@auth.verify_password
-def verify_credentials(username, password):
-    return (username, password) in {(app.config['BASIC_AUTH_USERNAME']), (app.config['BASIC_AUTH_PASSWORD'])}
+
+
 
 def init_config() -> TTS_Config:
     # config_path = "GPT_SoVITS/configs/tts_infer.yaml"
@@ -68,11 +67,14 @@ defaults = {
     "repetition_penalty": 1.35  # float.(optional) repetition penalty for T2S model.
 }
 
+@auth.verify_password
+def flask_verify_pw(username, password):
+    return check_credentials(username, password)
 
 def check_credentials(username, password):
     username_check = not app.config['BASIC_AUTH_USERNAME'] or username == app.config['BASIC_AUTH_USERNAME']
     password_check = not app.config['BASIC_AUTH_PASSWORD'] or password == app.config['BASIC_AUTH_PASSWORD']
-    return  username_check and password_check
+    return username_check and password_check
 
 def basic_auth(f):
     @wraps(f)
